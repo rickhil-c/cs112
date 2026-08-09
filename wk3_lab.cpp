@@ -82,7 +82,6 @@ void determineGrade(char grades[], int coursework[], int finals[], int size) {
             grades[i] = 'D';
         }
     }
-    
 }
 
 void discardLine(ifstream &input) {
