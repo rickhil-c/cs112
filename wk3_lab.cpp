@@ -8,7 +8,6 @@ using namespace std;
 const int MAX_SIZE = 10;
 const int MAX_ASSIGN = 5;
 
-
 void determineCoursework(int assignments[MAX_SIZE][MAX_ASSIGN], int mst[], int coursework[], int size);
 void determineGrade(char grades[], int coursework[], int finals[], int size);
 void discardLine(ifstream &input);
@@ -69,6 +68,7 @@ void determineCoursework(int assignments[MAX_SIZE][MAX_ASSIGN], int mst[], int c
 
 void determineGrade(char grades[], int coursework[], int finals[], int size) {
     int total;
+    
     for (int i = 0; i < size; i++) {
         total = coursework[i] + finals[i];
 
@@ -94,6 +94,7 @@ void discardLine(ifstream &input) {
 
 int getFailed(char grades[], int students) {
     int failed = 0;
+    
     for (int i = 0; i < students; i++) {
         if (grades[i] == 'D') {
             failed ++;
@@ -104,6 +105,7 @@ int getFailed(char grades[], int students) {
 
 void printStudentCoursework(string id[], int coursework[], char grades[], int final[], int size) {
     cout << setw(10) << left << "ID" << right << setw(10) << "COURSEWORK " << setw(6) <<"FINAL" << setw(7) << "GRADE"<< endl << endl;
+    
     for (int i = 0; i < size; i++) {
         cout << left << setw(10) << id[i] << right << setw(11) << coursework[i] << setw(7) << final[i] << setw(7) << grades[i]<< endl << left;
     }
