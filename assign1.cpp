@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <iomanip>
 
 using namespace std;
 
@@ -68,23 +68,15 @@ bool Medicine::validateUnits(int units) {
     return true;
 }
 
-string getStatus(Medicine m) {
-    int num = m.getUnits();
-
-    if (num == 0) {
-        return "Out of Stock";
-    }
-
-    return "Available";
-}
-
 bool getMedData(int &id, string &name, int &units, ifstream &file);
+string getStatus(Medicine m);
+bool isInArray(Medicine arr[], int size, int id, int &index);
+void validateId(Medicine arr[], int size);
 
 const int MAX_SIZE = 20;
 
 int main() {
     Medicine medicines[MAX_SIZE];
-
     Medicine *med;
 
     // Checking constructor functioning
@@ -122,11 +114,24 @@ int main() {
     return 0;
 }
 
+string getStatus(Medicine m) {
+    int num = m.getUnits();
+
+    if (num == 0) {
+        return "Out of Stock";
+    }
+
+    return "Available";
+}
+
+
+// Function that extracts data for members of medicine
+// Works for line formatted as id,name,units
 bool getMedData(int &id, string &name, int &units, ifstream &file) {
     string s;
     int last;
-    int start;
-    int stop;
+    int start = 0;
+    int stop = 0;
     int range;
 
     if (getline(file, s)) {
@@ -153,4 +158,88 @@ bool getMedData(int &id, string &name, int &units, ifstream &file) {
         return true;
     }
     return false;
+}
+
+void updateUnits(Medicine arr[], int size) {
+    int units;
+    int id = -1;
+    int index = validateId(arr, size, id);
+
+    if (index == -1) {
+        return;
+    }
+    
+    cout << "Enter updated units for medicine: ID: " << id << " Name: "
+        << arr[index].getName() << endl;
+
+    while (!(cin >> units)) {
+        cin.clear();
+        cin.ignore(1000, '\n');
+
+        cout << "Please enter a valid whole number for units\n";
+
+        if (shouldExit("units")) {
+            return;
+        }
+    }
+    arr[index].setUnits(units);
+}
+
+int validateId(Medicine arr[], int size, int &id) {
+    int index = 0;
+    char choice;
+    
+    cout << "Enter the Medicince ID:\n";
+
+    while (true) {
+        cin >> id;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            
+            if (shouldExit("ID")) {
+                return -1;
+            }
+
+            continue;
+        }
+
+        if (isInArray(arr,size, id, index)) {
+            break;
+        }
+
+        cout << "No Medicine ID matches " << id << endl;
+        
+        if (shouldExit("ID")) {
+            return -1;
+        }
+    }
+
+    return index;
+}
+
+// Function to check whether or not input id is inside Medicine array
+bool isInArray(Medicine arr[], int size, int id, int &index) {
+
+    for (int i = 0; i < size; i++) {
+
+        if (id == arr[i].getId()) {
+            index = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool shouldExit(string item) {
+    char choice = 'n';
+    bool do_exit = (choice == 'N' || choice == 'n');
+
+    cout << "Enter " << item << " again?\n Enter N to exit or any other letter to continue" << endl;
+    cin >> choice;
+
+    cin.ignore(1000, '\n');
+    
+    return do_exit;
 }
