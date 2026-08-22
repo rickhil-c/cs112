@@ -92,6 +92,7 @@ int main() {
 
     ifstream mdata("medicines.txt");
 
+    // Check successful opening of file
     if (!mdata) {
         cerr << "File failed to open.\n"
             << "Ensure file exists and is same directory as program.";
@@ -132,34 +133,44 @@ bool getMedData(int &id, string &name, int &units, ifstream &file) {
     int last;
     int start = 0;
     int stop = 0;
-    int range;
+    int name_length;
 
-    if (getline(file, s)) {
+    // Checks if line was successfully read into string
+    if (getline(file, s)) { 
         last = s.length() - 1;
 
+        // Slices string from first comma; id,...
+        // Gets id substring and converts to int
         for (int i = 0; i <= last; i++) {
             if (s[i] == ',') {
                 id = stoi(s.substr(0, i));
-                start = i + 1;
+                // Get index of first character of name
+                start = i + 1; 
                 break;
             }
         }
 
+        // Slices string from second/last comma; ...,units
+        // Gets units and converts to int
         for (int i = last; i > 0; i--) {
             if (s[i] == ',') {
                 units = stoi(s.substr(i + 1, last - i));
+                // Gets index of last comma
                 stop = i;
                 break;
             }
         }
 
-        range = stop - start;
-        name = s.substr(start, range);
+        // Calculates the length of name
+        name_length = stop - start;
+        name = s.substr(start, name_length);
         return true;
     }
     return false;
 }
 
+// Function to update units of a medicine corresponding to valid user given id 
+// input validation is handled in helper functions
 void updateUnits(Medicine arr[], int size) {
     int units;
     int id = -1;
@@ -183,8 +194,13 @@ void updateUnits(Medicine arr[], int size) {
         }
     }
     arr[index].setUnits(units);
+    cout << "\nUnits updated successfully.\n";
+    printHeader();
+    printMedInfo(arr[index]);
+    
 }
 
+// Helper function for update units; gets valid id of medicine
 int validateId(Medicine arr[], int size, int &id) {
     int index = 0;
     char choice;
@@ -219,7 +235,7 @@ int validateId(Medicine arr[], int size, int &id) {
     return index;
 }
 
-// Function to check whether or not input id is inside Medicine array
+// Helper function for id validation; checks if input id is in medicine array
 bool isInArray(Medicine arr[], int size, int id, int &index) {
 
     for (int i = 0; i < size; i++) {
@@ -232,6 +248,7 @@ bool isInArray(Medicine arr[], int size, int id, int &index) {
     return false;
 }
 
+// Reusable user loop exit function
 bool shouldExit(string item) {
     char choice = 'n';
     bool do_exit = (choice == 'N' || choice == 'n');
@@ -242,4 +259,46 @@ bool shouldExit(string item) {
     cin.ignore(1000, '\n');
     
     return do_exit;
+}
+
+// Gets the index(s) of the most abundant medicine(s)
+int getMostUnits(Medicine arr[], const int &size) {
+    int most_units = 0;
+    int max_index;
+
+    for (int i = 0; i < size; i++) {
+
+        if (arr[i].getUnits() > most_units) {
+            most_units = arr[i].getUnits();
+            max_index = i;
+        }
+    }
+    return max_index;
+}
+
+// =============================Printing Functions=================================================
+// Reusable label/header printer function
+void printHeader() {
+    cout << setw(5) << "ID" << setw(20) << "Name" << setw(5) << "Units" << endl;
+}
+
+// Prints info of one Medicine object
+void printMedInfo(Medicine med) {
+    cout << setw(5) << med.getId() << setw(20) << med.getName() << setw(5) << med.getUnits()
+        << getStatus(med) << endl;
+}
+
+// Prints info of entire array/ table of Medicine object
+void printMedList(Medicine arr[], int size) {
+    printHeader();
+
+    for (int i = 0; i < size; i++) {
+        printMedInfo(arr[i]);
+    }
+}
+
+void printMaxMed(Medicine arr[], const int &size) {
+    int max_index = getMostUnits(arr, size);
+    printHeader();
+    printMedInfo(arr[max_index]);
 }
